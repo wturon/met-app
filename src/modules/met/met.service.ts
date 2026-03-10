@@ -1,4 +1,4 @@
-const BASE_URL = "https://collectionapi.metmuseum.org/public/collection/v1";
+const BASE_URL = "https://met-interview-api.vercel.app/api/v1";
 
 // Types
 
@@ -45,7 +45,7 @@ export type TMetDepartment = {
 export class MetService {
   static async search(query: string) {
     const res = await fetch(
-      `${BASE_URL}/objects?q=${encodeURIComponent(query)}`
+      `${BASE_URL}/search?q=${encodeURIComponent(query)}`
     );
     return res.json() as Promise<TMetSearchResult>;
   }
