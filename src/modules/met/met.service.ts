@@ -16,6 +16,15 @@ export type TMetObject = {
   artistDisplayName: string;
   artistDisplayBio: string;
   artistNationality: string;
+  artistRole: string;
+  artistPrefix: string;
+  artistSuffix: string;
+  artistAlphaSort: string;
+  artistBeginDate: string;
+  artistEndDate: string;
+  artistGender: string;
+  artistWikidata_URL: string;
+  artistULAN_URL: string;
   objectDate: string;
   objectBeginDate: number;
   objectEndDate: number;
@@ -24,10 +33,42 @@ export type TMetObject = {
   creditLine: string;
   geographyType: string;
   city: string;
+  state: string;
+  county: string;
   country: string;
+  region: string;
+  subregion: string;
+  locale: string;
+  locus: string;
+  excavation: string;
+  river: string;
   classification: string;
   objectURL: string;
   isPublicDomain: boolean;
+  accessionNumber: string;
+  accessionYear: string;
+  constituents:
+    | {
+        constituentID: number;
+        role: string;
+        name: string;
+        constituentULAN_URL: string;
+        constituentWikidata_URL: string;
+        gender: string;
+      }[]
+    | null;
+  dynasty: string;
+  reign: string;
+  portfolio: string;
+  measurements: unknown | null;
+  rightsAndReproduction: string;
+  linkResource: string;
+  repository: string;
+  objectWikidata_URL: string;
+  tags: { term: string; AAT_URL: string; Wikidata_URL: string }[] | null;
+  isTimelineWork: boolean;
+  GalleryNumber: string;
+  metadataDate: string;
 };
 
 export type TMetSearchResult = {

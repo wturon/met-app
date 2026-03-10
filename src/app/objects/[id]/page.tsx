@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useState } from "react";
 import { useMetObject } from "@/modules/met/met.hooks";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -42,8 +43,36 @@ export default function ObjectDetailPage() {
   const objectID = Number(id);
   const isValidId = !isNaN(objectID) && objectID > 0;
   const { data, isLoading, isError } = useMetObject(objectID);
+  const [activeImage, setActiveImage] = useState<string | null>(null);
 
-  const geography = [data?.city, data?.country].filter(Boolean).join(", ");
+  const heroImage = activeImage || data?.primaryImage || "";
+
+  // Compose location string from non-empty geo fields
+  const geoFields = data
+    ? [data.city, data.state, data.county, data.region, data.subregion, data.locale, data.locus, data.country]
+    : [];
+  const locationString = geoFields.filter(Boolean).join(", ");
+  const locationLabel = data?.geographyType ? `${data.geographyType}: ` : "";
+
+  // Check if sections have content
+  const hasDateOrigin = data && (
+    data.period || data.dynasty || data.reign || data.culture || data.objectDate || locationString || data.excavation || data.river
+  );
+
+  const hasArtist = data && data.artistDisplayName;
+
+  const hasTags = data && data.tags && data.tags.length > 0;
+
+  const hasGalleryLinks = data && (
+    data.GalleryNumber || data.objectURL || data.objectWikidata_URL
+  );
+
+  const hasAdditionalImages = data && data.additionalImages && data.additionalImages.length > 0;
+
+  // Artist life dates
+  const artistDates = data && data.artistBeginDate && data.artistEndDate
+    ? `${data.artistBeginDate}–${data.artistEndDate}`
+    : data?.artistBeginDate || data?.artistEndDate || "";
 
   return (
     <div className="min-h-screen px-4 py-12 max-w-4xl mx-auto">
@@ -68,10 +97,10 @@ export default function ObjectDetailPage() {
         ) : (
           <>
             {/* Hero Image */}
-            {data.primaryImage ? (
+            {heroImage ? (
               <div className="relative w-full max-h-[600px] aspect-[4/3] rounded-lg bg-secondary overflow-hidden">
                 <Image
-                  src={data.primaryImage}
+                  src={heroImage}
                   alt={data.title}
                   fill
                   sizes="(max-width: 896px) 100vw, 896px"
@@ -87,8 +116,52 @@ export default function ObjectDetailPage() {
               </div>
             )}
 
-            {/* Title & Artist */}
-            <h1 className="font-display text-3xl font-bold mt-8">
+            {/* Additional Images Thumbnails */}
+            {hasAdditionalImages && (
+              <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
+                {data.primaryImage && (
+                  <button
+                    onClick={() => setActiveImage(null)}
+                    className={`relative w-16 h-16 rounded shrink-0 overflow-hidden border-2 transition-colors ${
+                      !activeImage ? "border-primary" : "border-transparent hover:border-muted-foreground/40"
+                    }`}
+                  >
+                    <Image
+                      src={data.primaryImage}
+                      alt={`${data.title} - main`}
+                      fill
+                      sizes="64px"
+                      className="object-cover"
+                    />
+                  </button>
+                )}
+                {data.additionalImages.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveImage(img)}
+                    className={`relative w-16 h-16 rounded shrink-0 overflow-hidden border-2 transition-colors ${
+                      activeImage === img ? "border-primary" : "border-transparent hover:border-muted-foreground/40"
+                    }`}
+                  >
+                    <Image
+                      src={img}
+                      alt={`${data.title} - image ${i + 2}`}
+                      fill
+                      sizes="64px"
+                      className="object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Title Block */}
+            {data.objectName && (
+              <p className="text-sm text-muted-foreground mt-8 uppercase tracking-wide">
+                {data.objectName}
+              </p>
+            )}
+            <h1 className={`font-display text-3xl font-bold ${data.objectName ? "mt-1" : "mt-8"}`}>
               {data.title}
             </h1>
             {(data.artistDisplayName || data.objectDate) && (
@@ -98,34 +171,134 @@ export default function ObjectDetailPage() {
                   .join(" · ")}
               </p>
             )}
-            {data.artistDisplayBio && (
-              <p className="text-sm text-muted-foreground mt-1">
-                {data.artistDisplayBio}
-              </p>
+
+            {/* Badges */}
+            {(data.isHighlight || data.isPublicDomain) && (
+              <div className="flex gap-2 mt-3">
+                {data.isHighlight && (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-primary text-white">
+                    Highlight
+                  </span>
+                )}
+                {data.isPublicDomain && (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">
+                    Public Domain
+                  </span>
+                )}
+              </div>
             )}
 
-            {/* Metadata Grid */}
-            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5 mt-10">
-              <MetadataItem label="Department" value={data.department} />
-              <MetadataItem label="Classification" value={data.classification} />
-              <MetadataItem label="Medium" value={data.medium} />
-              <MetadataItem label="Dimensions" value={data.dimensions} />
-              <MetadataItem label="Period" value={data.period} />
-              <MetadataItem label="Culture" value={data.culture} />
-              <MetadataItem label="Geography" value={geography} />
-              <MetadataItem label="Credit Line" value={data.creditLine} />
-            </dl>
+            {/* Section: Details */}
+            <div className="border-t border-border pt-8 mt-8">
+              <h2 className="font-display text-lg font-semibold mb-4">Details</h2>
+              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                <MetadataItem label="Department" value={data.department} />
+                <MetadataItem label="Classification" value={data.classification} />
+                <MetadataItem label="Object Name" value={data.objectName} />
+                <MetadataItem label="Medium" value={data.medium} />
+                <MetadataItem label="Dimensions" value={data.dimensions} />
+                <MetadataItem label="Accession Number" value={data.accessionNumber} />
+                <MetadataItem label="Credit Line" value={data.creditLine} />
+                <MetadataItem label="Repository" value={data.repository} />
+              </dl>
+            </div>
 
-            {/* Link to Met */}
-            {data.objectURL && (
-              <a
-                href={data.objectURL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block mt-10 text-sm text-primary hover:underline"
-              >
-                View on metmuseum.org &rarr;
-              </a>
+            {/* Section: Date & Origin */}
+            {hasDateOrigin && (
+              <div className="border-t border-border pt-8 mt-8">
+                <h2 className="font-display text-lg font-semibold mb-4">Date &amp; Origin</h2>
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                  <MetadataItem label="Date" value={data.objectDate} />
+                  <MetadataItem label="Period" value={data.period} />
+                  <MetadataItem label="Dynasty" value={data.dynasty} />
+                  <MetadataItem label="Reign" value={data.reign} />
+                  <MetadataItem label="Culture" value={data.culture} />
+                  {locationString && (
+                    <MetadataItem
+                      label="Location"
+                      value={`${locationLabel}${locationString}`}
+                    />
+                  )}
+                  <MetadataItem label="Excavation" value={data.excavation} />
+                  <MetadataItem label="River" value={data.river} />
+                </dl>
+              </div>
+            )}
+
+            {/* Section: The Artist */}
+            {hasArtist && (
+              <div className="border-t border-border pt-8 mt-8">
+                <h2 className="font-display text-lg font-semibold mb-4">The Artist</h2>
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                  <MetadataItem label="Name" value={data.artistDisplayName} />
+                  <MetadataItem label="Role" value={data.artistRole} />
+                  <MetadataItem label="Bio" value={data.artistDisplayBio} />
+                  <MetadataItem label="Nationality" value={data.artistNationality} />
+                  <MetadataItem label="Life Dates" value={artistDates} />
+                </dl>
+                {data.artistWikidata_URL && (
+                  <a
+                    href={data.artistWikidata_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block mt-4 text-sm text-primary hover:underline"
+                  >
+                    View artist on Wikidata &rarr;
+                  </a>
+                )}
+              </div>
+            )}
+
+            {/* Section: Tags */}
+            {hasTags && (
+              <div className="border-t border-border pt-8 mt-8">
+                <h2 className="font-display text-lg font-semibold mb-4">Tags</h2>
+                <div className="flex flex-wrap gap-2">
+                  {data.tags!.map((tag) => (
+                    <Link
+                      key={tag.term}
+                      href={`/?q=${encodeURIComponent(tag.term)}`}
+                      className="text-xs px-3 py-1 rounded-full bg-secondary text-foreground hover:bg-primary hover:text-white transition-colors"
+                    >
+                      {tag.term}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Section: Gallery & Links */}
+            {hasGalleryLinks && (
+              <div className="border-t border-border pt-8 mt-8">
+                <h2 className="font-display text-lg font-semibold mb-4">Gallery &amp; Links</h2>
+                {data.GalleryNumber && (
+                  <p className="text-sm text-foreground mb-3">
+                    On view in Gallery {data.GalleryNumber}
+                  </p>
+                )}
+                <div className="flex flex-wrap gap-4">
+                  {data.objectURL && (
+                    <a
+                      href={data.objectURL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline"
+                    >
+                      View on metmuseum.org &rarr;
+                    </a>
+                  )}
+                  {data.objectWikidata_URL && (
+                    <a
+                      href={data.objectWikidata_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline"
+                    >
+                      View on Wikidata &rarr;
+                    </a>
+                  )}
+                </div>
+              </div>
             )}
           </>
         )}
