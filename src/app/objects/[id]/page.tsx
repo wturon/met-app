@@ -257,7 +257,7 @@ export default function ObjectDetailPage() {
                   {data.tags!.map((tag) => (
                     <Link
                       key={tag.term}
-                      href={`/?q=${encodeURIComponent(tag.term)}`}
+                      href={`/search?q=${encodeURIComponent(tag.term)}`}
                       className="text-xs px-3 py-1 rounded-full bg-secondary text-foreground hover:bg-primary hover:text-white transition-colors"
                     >
                       {tag.term}
