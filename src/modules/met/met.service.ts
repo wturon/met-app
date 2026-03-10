@@ -43,21 +43,28 @@ export type TMetDepartment = {
 // Service
 
 export class MetService {
+  private static async handleResponse<T>(res: Response): Promise<T> {
+    if (!res.ok) {
+      throw new Error(`API error: ${res.status} ${res.statusText}`);
+    }
+    return res.json() as Promise<T>;
+  }
+
   static async search(query: string) {
     const res = await fetch(
-      `${BASE_URL}/search?q=${encodeURIComponent(query)}`
+      `${BASE_URL}/search?q=${encodeURIComponent(query)}`,
     );
-    return res.json() as Promise<TMetSearchResult>;
+    return this.handleResponse<TMetSearchResult>(res);
   }
 
   static async getObject(objectID: number) {
     const res = await fetch(`${BASE_URL}/objects/${objectID}`);
-    return res.json() as Promise<TMetObject>;
+    return this.handleResponse<TMetObject>(res);
   }
 
-  static async getDepartments() {
-    const res = await fetch(`${BASE_URL}/departments`);
-    const data = await res.json();
-    return data.departments as TMetDepartment[];
-  }
+  // static async getDepartments() {
+  //   const res = await fetch(`${BASE_URL}/departments`);
+  //   const data = await this.handleResponse<{ departments: TMetDepartment[] }>(res);
+  //   return data.departments;
+  // }
 }

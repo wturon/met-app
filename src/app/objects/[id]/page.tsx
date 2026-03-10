@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useMetObject } from "@/modules/met/met.hooks";
@@ -39,6 +40,7 @@ function LoadingSkeleton() {
 export default function ObjectDetailPage() {
   const { id } = useParams<{ id: string }>();
   const objectID = Number(id);
+  const isValidId = !isNaN(objectID) && objectID > 0;
   const { data, isLoading, isError } = useMetObject(objectID);
 
   const geography = [data?.city, data?.country].filter(Boolean).join(", ");
@@ -53,7 +55,11 @@ export default function ObjectDetailPage() {
       </Link>
 
       <div className="mt-6">
-        {isLoading ? (
+        {!isValidId ? (
+          <div className="rounded-lg bg-secondary p-8 text-muted-foreground text-sm">
+            Invalid artwork ID.
+          </div>
+        ) : isLoading ? (
           <LoadingSkeleton />
         ) : isError || !data ? (
           <div className="rounded-lg bg-secondary p-8 text-muted-foreground text-sm">
@@ -63,11 +69,16 @@ export default function ObjectDetailPage() {
           <>
             {/* Hero Image */}
             {data.primaryImage ? (
-              <img
-                src={data.primaryImage}
-                alt={data.title}
-                className="w-full max-h-[600px] object-contain rounded-lg bg-secondary"
-              />
+              <div className="relative w-full max-h-[600px] aspect-[4/3] rounded-lg bg-secondary overflow-hidden">
+                <Image
+                  src={data.primaryImage}
+                  alt={data.title}
+                  fill
+                  sizes="(max-width: 896px) 100vw, 896px"
+                  className="object-contain"
+                  priority
+                />
+              </div>
             ) : (
               <div className="w-full aspect-[4/3] rounded-lg bg-secondary flex items-center justify-center">
                 <span className="text-muted-foreground text-sm">

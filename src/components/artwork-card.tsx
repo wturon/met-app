@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useMetObject } from "@/modules/met/met.hooks";
 
@@ -22,16 +23,27 @@ export function ArtworkCard({ id }: { id: number }) {
     );
   }
 
-  const imageSrc = object.primaryImageSmall || object.primaryImage || FALLBACK_IMAGE;
+  const imageSrc = object.primaryImageSmall || object.primaryImage;
 
   return (
     <Link href={`/objects/${id}`} className="group block">
-      <div className="overflow-hidden rounded-lg bg-secondary aspect-[3/4]">
-        <img
-          src={imageSrc}
-          alt={object.title || "Artwork"}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-        />
+      <div className="overflow-hidden rounded-lg bg-secondary aspect-[3/4] relative">
+        {imageSrc ? (
+          <Image
+            src={imageSrc}
+            alt={object.title || "Artwork"}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={FALLBACK_IMAGE}
+            alt="No image available"
+            className="h-full w-full object-cover"
+          />
+        )}
       </div>
       <div className="mt-2">
         <h3 className="text-sm font-medium text-foreground line-clamp-1 group-hover:text-primary transition-colors">

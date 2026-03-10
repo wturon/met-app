@@ -17,9 +17,9 @@ export const useMetObject = (objectID: number) => {
   });
 };
 
-export const useMetDepartments = () => {
-  return useQuery({
-    queryKey: ["met", "departments"],
-    queryFn: () => MetService.getDepartments(),
-  });
-};
+// export const useMetDepartments = () => {
+//   return useQuery({
+//     queryKey: ["met", "departments"],
+//     queryFn: () => MetService.getDepartments(),
+//   });
+// };
