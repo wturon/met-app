@@ -16,10 +16,3 @@ export const useMetObject = (objectID: number) => {
     enabled: !!objectID,
   });
 };
-
-// export const useMetDepartments = () => {
-//   return useQuery({
-//     queryKey: ["met", "departments"],
-//     queryFn: () => MetService.getDepartments(),
-//   });
-// };

@@ -102,10 +102,4 @@ export class MetService {
     const res = await fetch(`${BASE_URL}/objects/${objectID}`);
     return this.handleResponse<TMetObject>(res);
   }
-
-  // static async getDepartments() {
-  //   const res = await fetch(`${BASE_URL}/departments`);
-  //   const data = await this.handleResponse<{ departments: TMetDepartment[] }>(res);
-  //   return data.departments;
-  // }
 }
