@@ -5,7 +5,7 @@ import { Suspense, useEffect, useRef } from "react";
 import { useQueryState, parseAsInteger, parseAsString } from "nuqs";
 import { useMetSearch } from "@/modules/met/met.hooks";
 import { useRecentSearches } from "@/modules/met/use-recent-searches";
-import { ArtworkCard } from "@/components/artwork-card";
+import { ArtworkCard } from "@/app/search/_components/artwork-card";
 
 const PAGE_SIZE = 20;
 
@@ -36,7 +36,7 @@ function SearchResults() {
   const safePage = Math.min(Math.max(page, 0), maxPage);
   const paginatedIDs = objectIDs.slice(
     safePage * PAGE_SIZE,
-    (safePage + 1) * PAGE_SIZE
+    (safePage + 1) * PAGE_SIZE,
   );
 
   useEffect(() => {
@@ -80,9 +80,7 @@ function SearchResults() {
         Results for: <span className="text-primary">{normalizedQuery}</span>
       </h1>
 
-      {isLoading && (
-        <p className="text-muted-foreground mb-8">Searching...</p>
-      )}
+      {isLoading && <p className="text-muted-foreground mb-8">Searching...</p>}
 
       {isError && (
         <p className="text-destructive mb-8">
@@ -98,7 +96,9 @@ function SearchResults() {
 
       {data && data.total === 0 ? (
         <div className="rounded-xl border border-border bg-secondary/70 p-8 text-sm text-muted-foreground">
-          No matches for <span className="font-medium text-foreground">{normalizedQuery}</span>.
+          No matches for{" "}
+          <span className="font-medium text-foreground">{normalizedQuery}</span>
+          .
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
