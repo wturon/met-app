@@ -2,10 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { MetService } from "./met.service";
 
 export const useMetSearch = (query: string) => {
+  const normalized = query.toLowerCase();
   return useQuery({
-    queryKey: ["met", "search", query],
-    queryFn: () => MetService.search(query),
-    enabled: !!query,
+    queryKey: ["met", "search", normalized],
+    queryFn: () => MetService.search(normalized),
+    enabled: !!normalized,
   });
 };
 

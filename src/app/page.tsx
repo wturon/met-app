@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useRecentSearches } from "@/modules/met/use-recent-searches";
@@ -12,7 +12,7 @@ export default function Home() {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const trimmedQuery = query.trim();
-  const { searches: recentSearches } = useRecentSearches();
+  const { searches: recentSearches, removeSearch } = useRecentSearches();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -86,13 +86,21 @@ export default function Home() {
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               {recentSearches.map((term) => (
-                <Link
+                <span
                   key={term}
-                  href={`/search?q=${encodeURIComponent(term)}`}
-                  className="rounded-full border border-primary/20 bg-primary/5 px-3.5 py-1.5 text-sm text-foreground shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/10"
+                  className="group/chip inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/5 py-1.5 pl-3.5 pr-2 text-sm text-foreground shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/10"
                 >
-                  {term}
-                </Link>
+                  <Link href={`/search?q=${encodeURIComponent(term)}`}>
+                    {term}
+                  </Link>
+                  <button
+                    onClick={() => removeSearch(term)}
+                    className="rounded-full p-0.5 text-muted-foreground/60 transition-colors hover:bg-primary/10 hover:text-foreground"
+                    aria-label={`Remove ${term} from recent searches`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
               ))}
             </div>
           </div>

@@ -20,7 +20,7 @@ export default function SearchPage() {
 function SearchResults() {
   const [q] = useQueryState("q", parseAsString.withDefault(""));
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(0));
-  const normalizedQuery = q.trim();
+  const normalizedQuery = q.trim().toLowerCase();
   const previousQueryRef = useRef(normalizedQuery);
 
   const { addSearch } = useRecentSearches();

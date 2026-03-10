@@ -29,5 +29,13 @@ export function useRecentSearches() {
     });
   }, []);
 
-  return { searches, addSearch };
+  const removeSearch = useCallback((query: string) => {
+    setSearches((prev) => {
+      const updated = prev.filter((s) => s !== query);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
+  return { searches, addSearch, removeSearch };
 }
