@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
+import { useQueryState, parseAsInteger, parseAsString } from "nuqs";
 import { useMetSearch } from "@/modules/met/met.hooks";
 import { ArtworkCard } from "@/components/artwork-card";
 
@@ -17,9 +17,8 @@ export default function SearchPage() {
 }
 
 function SearchResults() {
-  const searchParams = useSearchParams();
-  const q = searchParams.get("q") ?? "";
-  const [page, setPage] = useState(0);
+  const [q] = useQueryState("q", parseAsString.withDefault(""));
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(0));
 
   const { data, isLoading, isError } = useMetSearch(q);
 
@@ -65,7 +64,7 @@ function SearchResults() {
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-4 mt-10">
           <button
-            onClick={() => setPage((p) => p - 1)}
+            onClick={() => setPage((p) => (p ?? 0) - 1)}
             disabled={page === 0}
             className="rounded-md border border-border px-4 py-2 text-sm disabled:opacity-40 hover:bg-secondary transition-colors"
           >
@@ -75,7 +74,7 @@ function SearchResults() {
             Page {page + 1} of {totalPages}
           </span>
           <button
-            onClick={() => setPage((p) => p + 1)}
+            onClick={() => setPage((p) => (p ?? 0) + 1)}
             disabled={page >= totalPages - 1}
             className="rounded-md border border-border px-4 py-2 text-sm disabled:opacity-40 hover:bg-secondary transition-colors"
           >
