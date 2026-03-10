@@ -109,10 +109,22 @@ export default function ObjectDetailPage() {
                 />
               </div>
             ) : (
-              <div className="w-full aspect-[4/3] rounded-lg bg-secondary flex items-center justify-center">
-                <span className="text-muted-foreground text-sm">
-                  No image available
-                </span>
+              <div className="w-full aspect-[4/3] rounded-lg bg-secondary/80 flex flex-col items-center justify-center gap-3 text-muted-foreground/60">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 64 64"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-16 h-16"
+                >
+                  <rect x="8" y="12" width="48" height="40" rx="3" />
+                  <path d="M8 42l14-12 10 8 8-6 16 12" />
+                  <circle cx="24" cy="26" r="5" />
+                </svg>
+                <span className="text-sm tracking-wide">No image available for this artwork</span>
               </div>
             )}
 
@@ -255,13 +267,12 @@ export default function ObjectDetailPage() {
                 <h2 className="font-display text-lg font-semibold mb-4">Tags</h2>
                 <div className="flex flex-wrap gap-2">
                   {data.tags!.map((tag) => (
-                    <Link
+                    <span
                       key={tag.term}
-                      href={`/search?q=${encodeURIComponent(tag.term)}`}
-                      className="text-xs px-3 py-1 rounded-full bg-secondary text-foreground hover:bg-primary hover:text-white transition-colors"
+                      className="text-xs px-3 py-1 rounded-full bg-secondary text-foreground"
                     >
                       {tag.term}
-                    </Link>
+                    </span>
                   ))}
                 </div>
               </div>

@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useRecentSearches } from "@/modules/met/use-recent-searches";
 
 const SUGGESTED_TERMS = ["monet", "sunflower", "sun", "vacuum", "tesselation"];
 
@@ -10,6 +12,7 @@ export default function Home() {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const trimmedQuery = query.trim();
+  const { searches: recentSearches } = useRecentSearches();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -75,6 +78,25 @@ export default function Home() {
             ? "Press Enter to search."
             : "Try monet, sunflower, sun, vacuum, or tesselation."}
         </p>
+
+        {recentSearches.length > 0 && (
+          <div className="mt-6 animate-rise-in [animation-delay:300ms]">
+            <p className="text-xs text-muted-foreground mb-2 text-center">
+              Recent searches
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {recentSearches.map((term) => (
+                <Link
+                  key={term}
+                  href={`/search?q=${encodeURIComponent(term)}`}
+                  className="rounded-full border border-primary/20 bg-primary/5 px-3.5 py-1.5 text-sm text-foreground shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/10"
+                >
+                  {term}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-7 flex flex-wrap justify-center gap-2 animate-rise-in [animation-delay:300ms]">
           {SUGGESTED_TERMS.map((term, index) => (

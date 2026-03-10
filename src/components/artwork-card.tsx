@@ -4,7 +4,27 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMetObject } from "@/modules/met/met.hooks";
 
-const FALLBACK_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect fill='%23FAFAFA' width='400' height='400'/%3E%3Ctext fill='%23767676' font-family='sans-serif' font-size='14' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3ENo Image Available%3C/text%3E%3C/svg%3E";
+function ImagePlaceholder() {
+  return (
+    <div className="h-full w-full flex flex-col items-center justify-center bg-secondary/80 text-muted-foreground/60 gap-3 p-6">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 64 64"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="w-10 h-10"
+      >
+        <rect x="8" y="12" width="48" height="40" rx="3" />
+        <path d="M8 42l14-12 10 8 8-6 16 12" />
+        <circle cx="24" cy="26" r="5" />
+      </svg>
+      <span className="text-xs tracking-wide">No preview</span>
+    </div>
+  );
+}
 
 export function ArtworkCard({ id }: { id: number }) {
   const { data: object, isLoading, isError } = useMetObject(id);
@@ -37,12 +57,7 @@ export function ArtworkCard({ id }: { id: number }) {
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={FALLBACK_IMAGE}
-            alt="No image available"
-            className="h-full w-full object-cover"
-          />
+          <ImagePlaceholder />
         )}
       </div>
       <div className="mt-2">

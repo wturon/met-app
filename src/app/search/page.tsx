@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense, useEffect, useRef } from "react";
 import { useQueryState, parseAsInteger, parseAsString } from "nuqs";
 import { useMetSearch } from "@/modules/met/met.hooks";
+import { useRecentSearches } from "@/modules/met/use-recent-searches";
 import { ArtworkCard } from "@/components/artwork-card";
 
 const PAGE_SIZE = 20;
@@ -22,7 +23,12 @@ function SearchResults() {
   const normalizedQuery = q.trim();
   const previousQueryRef = useRef(normalizedQuery);
 
+  const { addSearch } = useRecentSearches();
   const { data, isLoading, isError } = useMetSearch(normalizedQuery);
+
+  useEffect(() => {
+    if (normalizedQuery) addSearch(normalizedQuery);
+  }, [normalizedQuery, addSearch]);
 
   const objectIDs = data?.objectIDs ?? [];
   const totalPages = Math.ceil(objectIDs.length / PAGE_SIZE);
